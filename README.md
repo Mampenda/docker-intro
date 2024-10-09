@@ -62,30 +62,58 @@ psql: FATAL: role "user" does not exist
 So, I deleted the container and tried again:
 ```
 amali@MampendaPC MINGW64 ~
-$ docker run -p 5432:5432 -e POSTGRES_PASSWORD=mypassword -d --name my-postgres --rm postgres postgres 
-73261b55aedb388fc031eff8a908f30b6d2df10f1efe645d816dae17dc91956b
+$ docker run -p 5432:5432 -e POSTGRES_PASSWORD=mypassword -e POSTGRES_USERNAME=myusername -d --name my-postgres --rm postgres postgres
+32e0e9dcd8d4fbafe9b4493bc64df5f6afc6c77d820b71e0d3e61eb1081d175e
 
 amali@MampendaPC MINGW64 ~
 $ docker ps
 CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS          PORTS                    NAMES
-73261b55aedb   postgres   "docker-entrypoint.s…"   26 seconds ago   Up 25 seconds   0.0.0.0:5432->5432/tcp   my-postgres
-
-amali@MampendaPC MINGW64 ~
-$ docker ps
-CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS          PORTS                    NAMES
-73261b55aedb   postgres   "docker-entrypoint.s…"   43 seconds ago   Up 42 seconds   0.0.0.0:5432->5432/tcp   my-postgres
+32e0e9dcd8d4   postgres   "docker-entrypoint.s…"   21 seconds ago   Up 21 seconds   0.0.0.0:5432->5432/tcp   my-postgres
 
 amali@MampendaPC MINGW64 ~
 $ winpty docker exec -it my-postgres bash
-root@73261b55aedb:/# pwd
-/
-root@73261b55aedb:/# psql
-psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: FATAL:  role "root" does not exist
 root@73261b55aedb:/# psql -U postgres
 psql (17.0 (Debian 17.0-1.pgdg120+1))
 Type "help" for help.
+ 
+postgres=# create user myusername with password 'mypassword';
+CREATE ROLE
+postgres=# \du
+                              List of roles
+ Role name  |                         Attributes
+------------+------------------------------------------------------------
+ myusername |
+ postgres   | Superuser, Create role, Create DB, Replication, Bypass RLS
 
-postgres=#
+postgres=# create database test;
+CREATE DATABASE
+postgres=# \l
+                                                    List of databases
+   Name    |  Owner   | Encoding | Locale Provider |  Collate   |   Ctype    | Locale | ICU Rules |   Access privileges
+-----------+----------+----------+-----------------+------------+------------+--------+-----------+-----------------------
+ postgres  | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           |
+ template0 | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           | =c/postgres          +
+           |          |          |                 |            |            |        |           | postgres=CTc/postgres
+ template1 | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           | =c/postgres          +
+           |          |          |                 |            |            |        |           | postgres=CTc/postgres
+ test      | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           |
+(4 rows)
 
+postgres=# \c test
+You are now connected to database "test" as user "postgres".
+test=# \d
+Did not find any relations.
+```
+I opened another gitBash terminal and ran the command (password: 1234)
+```
+amali@MampendaPC MINGW64 ~ 
+$ psql -h localhost -p 5432 -U postgres
+Password for user postgres:
+psql (17.0)
+Type "help" for help.
+postgres=# create database test2;
+CREATE DATABASE
+postgres=# \c test
+You are now connected to database "test" as user "postgres".
 ```
 
