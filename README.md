@@ -29,11 +29,9 @@ By default, PostgreSQL uses port 5432, so I mapped the port on both host and con
 and set the username and password with the environmental argument `-e`.
 
 ```
-docker run -p 5432:5432 \
-           -e POSTGRES_USER=myusername \
-           -e POSTGRES_PASSWORD=mypassword \
-           -e POSTGRES_DB=mydatabase
-           -d --name my-postgres --rm postgres
+amali@MampendaPC MINGW64 ~/IdeaProjects/DAT250/docker-intro/docker-intro (main)
+$ docker run -p 5432:5432 -e POSTGRES_USER=myusername -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydatabase -d --name my-postgres --rm postgres postgres
+dfbd112eca53a482da5d4b289cfa977dcc3a85e04a61142ba47381ce420d2857
 ```
 After which, I could see my running Docker container: 
 ```
@@ -52,4 +50,42 @@ I was unable to connect to the running Docker container, so I stopped and delete
 accordingly: 
 
 ![img.png](img.png)
+
+This did not work either because I kept getting errors when trying to enter the container bash. 
+
+```
+psql: FATAL: role "postgres" does not exist
+psql: FATAL: role "my-username" does not exist
+psql: FATAL: role "user" does not exist
+```
+
+So, I deleted the container and tried again:
+```
+amali@MampendaPC MINGW64 ~
+$ docker run -p 5432:5432 -e POSTGRES_PASSWORD=mypassword -d --name my-postgres --rm postgres postgres 
+73261b55aedb388fc031eff8a908f30b6d2df10f1efe645d816dae17dc91956b
+
+amali@MampendaPC MINGW64 ~
+$ docker ps
+CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS          PORTS                    NAMES
+73261b55aedb   postgres   "docker-entrypoint.s…"   26 seconds ago   Up 25 seconds   0.0.0.0:5432->5432/tcp   my-postgres
+
+amali@MampendaPC MINGW64 ~
+$ docker ps
+CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS          PORTS                    NAMES
+73261b55aedb   postgres   "docker-entrypoint.s…"   43 seconds ago   Up 42 seconds   0.0.0.0:5432->5432/tcp   my-postgres
+
+amali@MampendaPC MINGW64 ~
+$ winpty docker exec -it my-postgres bash
+root@73261b55aedb:/# pwd
+/
+root@73261b55aedb:/# psql
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: FATAL:  role "root" does not exist
+root@73261b55aedb:/# psql -U postgres
+psql (17.0 (Debian 17.0-1.pgdg120+1))
+Type "help" for help.
+
+postgres=#
+
+```
 
