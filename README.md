@@ -32,6 +32,7 @@ and set the username and password with the environmental argument `-e`.
 docker run -p 5432:5432 \
            -e POSTGRES_USER=myusername \
            -e POSTGRES_PASSWORD=mypassword \
+           -e POSTGRES_DB=mydatabase
            -d --name my-postgres --rm postgres
 ```
 After which, I could see my running Docker container: 
@@ -40,5 +41,15 @@ $ docker ps
 CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS          PORTS                    NAMES
 23fe9671801e   postgres   "docker-entrypoint.s…"   17 seconds ago   Up 16 seconds   0.0.0.0:5432->5432/tcp   my-postgres
 ```
-I connected the database to the built-in client in IntelliJ by clicking on the database icon on the right-side menu, 
-then "Create Source" and adding the correct fields for my database. 
+Once this was done, I opened `Settings` > `Build, Execution, Deployment` > `Docker` and clicked on the "Add"-button 
+(plus) sign in the upper left corner. IntelliJ detected that I was running Docker Desktop and sat all the fields for me,
+so I could see the message "Connection successful" in the lower left corner. I clicked "Apply" and "OK" and opened 
+`Services` where I could see the Docker daemon running and clicked "connect" (green play button).
+
+I was unable to connect to the running Docker container, so I stopped and deleted it. Then, opened `Services` > `Docker` >
+`Images` in IntelliJ again and right-clicked `Images`, where a drop-down menu appeared with the option to 
+"Create container". A new window opened, prompting for me to input some values into the fields. So I filled it in 
+accordingly: 
+
+![img.png](img.png)
+
